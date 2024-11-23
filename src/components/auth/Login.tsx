@@ -157,6 +157,13 @@ export const Login: React.FC = () => {
         username: email,
         password: password,
       });
+      console.log('Login response:', response)
+      if (response.access_token) {
+        localStorage.setItem('token', response.access_token);
+        console.log('Token saved:', response.access_token); // Debug log
+      } else {
+        console.error('No token in response');
+      }
 
       setLoginSuccess(true);
       await new Promise(resolve => setTimeout(resolve, 1000)); // Show success animation

@@ -48,3 +48,8 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export const checkAuthStatus = () => {
+  const token = localStorage.getItem('token');
+  return !!token;
+};

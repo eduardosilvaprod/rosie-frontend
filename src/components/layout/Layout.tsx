@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Box,
   AppBar,
@@ -16,6 +16,7 @@ import {
   Avatar,
   Menu,
   MenuItem,
+  ListItemButton,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -23,15 +24,18 @@ import {
   Dashboard as DashboardIcon,
   Person as PersonIcon,
   ExitToApp as LogoutIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Breadcrumbs } from '../common/Breadcrumbs';
 
 const DRAWER_WIDTH = 240;
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -58,6 +62,24 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     navigate('/login');
   };
 
+  const menuItems = [
+    {
+      text: 'Dashboard',
+      icon: <DashboardIcon />,
+      path: '/dashboard',
+    },
+    {
+      text: 'Invoices',
+      icon: <ReceiptIcon />,
+      path: '/invoices',
+    },
+    {
+      text: 'Settings',
+      icon: <SettingsIcon />,
+      path: '/settings',
+    },
+  ];
+
   const drawerContent = (
     <Box>
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -67,18 +89,36 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       </Box>
       <Divider />
       <List>
-        <ListItem button onClick={() => navigate('/dashboard')}>
-          <ListItemIcon>
-            <DashboardIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Dashboard" />
-        </ListItem>
-        <ListItem button onClick={() => navigate('/invoices')}>
-          <ListItemIcon>
-            <ReceiptIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Invoices" />
-        </ListItem>
+        {menuItems.map((item) => (
+          <ListItem key={item.text} disablePadding>
+            <ListItemButton
+              onClick={() => {
+                navigate(item.path);
+                setMobileOpen(false);
+              }}
+              selected={location.pathname === item.path}
+              sx={{
+                '&.Mui-selected': {
+                  backgroundColor: theme.palette.primary.main + '20',
+                },
+                '&:hover': {
+                  backgroundColor: theme.palette.primary.main + '10',
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  color: location.pathname === item.path
+                    ? theme.palette.primary.main
+                    : 'inherit',
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
       </List>
     </Box>
   );
@@ -163,6 +203,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           minHeight: '100vh',
         }}
       >
+        <Breadcrumbs />
         {children}
       </Box>
 
